@@ -1,5 +1,6 @@
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export function ContactPage() {
   const [formData, setFormData] = useState({
@@ -270,12 +271,12 @@ export function ContactPage() {
                 <p className="text-gray-300 mb-6">
                   Book a discovery call directly with our team to discuss your project in detail.
                 </p>
-                <a
-                  href="/contact"
+                <Link
+                  to="/contact"
                   className="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-base font-semibold text-gray-900 hover:bg-gray-100 transition-colors"
                 >
                   Book a Discovery Call
-                </a>
+                </Link>
               </div>
             </div>
           </div>

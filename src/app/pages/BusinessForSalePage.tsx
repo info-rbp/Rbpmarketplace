@@ -1,9 +1,19 @@
 import { BusinessCard } from '../components/BusinessCard';
-import { Filter } from 'lucide-react';
-import { getBusinessesByType } from '../data/businesses';
+import { Filter, X } from 'lucide-react';
+import { getBusinessesByType } from '../data/businessStore';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 export function BusinessForSalePage() {
-  const businesses = getBusinessesByType('standard');
+  const allBusinesses = getBusinessesByType('standard');
+  const categories = ['All', ...Array.from(new Set(allBusinesses.map((b) => b.category)))];
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const filtered =
+    activeCategory === 'All'
+      ? allBusinesses
+      : allBusinesses.filter((b) => b.category === activeCategory);
 
   return (
     <div className="bg-white min-h-screen">
@@ -23,28 +33,82 @@ export function BusinessForSalePage() {
       </section>
 
       {/* Filters Section */}
-      <section className="border-b border-gray-200 bg-white sticky top-20 z-40">
+      <section className="border-b border-gray-200 bg-white sticky top-20 z-40 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold text-gray-900">{businesses.length}</span> businesses available
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-sm text-gray-600 shrink-0">
+              <span className="font-semibold text-gray-900">{filtered.length}</span> of{' '}
+              <span className="font-semibold text-gray-900">{allBusinesses.length}</span> businesses
             </p>
-            <button className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-              <Filter className="h-4 w-4" />
-              Filter
+
+            {/* Desktop category pills */}
+            <div className="hidden md:flex items-center gap-2 flex-wrap">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                    activeCategory === cat
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Mobile filter toggle */}
+            <button
+              className="md:hidden inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              onClick={() => setFilterOpen(!filterOpen)}
+            >
+              {filterOpen ? <X className="h-4 w-4" /> : <Filter className="h-4 w-4" />}
+              {filterOpen ? 'Close' : 'Filter'}
             </button>
           </div>
+
+          {/* Mobile filter drawer */}
+          {filterOpen && (
+            <div className="md:hidden mt-3 flex flex-wrap gap-2 pb-1">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => { setActiveCategory(cat); setFilterOpen(false); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                    activeCategory === cat
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Listings Grid */}
       <section className="py-12 bg-gray-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {businesses.map((business, index) => (
-              <BusinessCard key={index} {...business} />
-            ))}
-          </div>
+          {filtered.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filtered.map((business) => (
+                <BusinessCard key={business.id} {...business} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-lg text-gray-500 mb-4">No businesses found in this category.</p>
+              <button
+                onClick={() => setActiveCategory('All')}
+                className="text-blue-600 font-semibold hover:underline"
+              >
+                View all businesses
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -57,12 +121,12 @@ export function BusinessForSalePage() {
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             We can build a custom web application or digital business tailored to your specific requirements and goals.
           </p>
-          <a
-            href="/custom-solutions"
+          <Link
+            to="/custom-solutions"
             className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-4 text-base font-semibold text-white hover:bg-blue-500 transition-colors"
           >
             Request Custom Solution
-          </a>
+          </Link>
         </div>
       </section>
     </div>
