@@ -1,6 +1,6 @@
 import { BusinessCard } from '../components/BusinessCard';
 import { Filter, X } from 'lucide-react';
-import { getBusinessesByType } from '../data/businesses';
+import { getBusinessesByType } from '../data/businessStore';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { CheckCircle2, Package, ArrowRight, Star } from 'lucide-react';
-import { getBusinessesByType } from '../data/businesses';
+import { getBusinessesByType } from '../data/businessStore';
 
 export function BusinessInABoxPage() {
   const packages = getBusinessesByType('business-in-a-box');

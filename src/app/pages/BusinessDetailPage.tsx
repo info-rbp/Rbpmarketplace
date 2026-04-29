@@ -1,5 +1,5 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
-import { getBusinessById } from '../data/businesses';
+import { getBusinessById } from '../data/businessStore';
 import { ArrowLeft, CheckCircle2, Package, Code, Target, DollarSign, Users, ArrowRight } from 'lucide-react';
 
 export function BusinessDetailPage() {

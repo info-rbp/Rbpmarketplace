@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, Shield, Headphones, TrendingUp } from 'lucide-react';
 import { BusinessCard } from '../components/BusinessCard';
-import { getFeaturedBusinesses } from '../data/businesses';
+import { getFeaturedBusinesses } from '../data/businessStore';
 
 export function HomePage() {
-  const featuredListings = getFeaturedBusinesses().slice(0, 3);
+  const featuredListings = getFeaturedBusinesses().slice(0, 3);  // live from store
 
   return (
     <div className="bg-white">
