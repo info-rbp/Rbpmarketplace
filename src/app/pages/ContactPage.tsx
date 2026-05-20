@@ -411,15 +411,6 @@ export function ContactPage() {
                   We typically respond to all enquiries within 24 hours during business days.
                   For urgent matters, please mention it in your message.
                 </p>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold text-gray-900">Business Hours:</span>
-                    <br />
-                    Monday - Friday: 9:00 AM - 6:00 PM EST
-                    <br />
-                    Saturday - Sunday: Closed
-                  </p>
-                </div>
               </div>
 
               <div className="bg-gray-900 rounded-2xl p-8 text-white">
