@@ -1,68 +1,51 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { Badge } from './Badge';
+import type { BusinessConcept } from '@/app/data/types';
+import { getCategoryName } from '@/app/lib/business';
+import { trackEvent } from '@/app/lib/analytics';
 
 interface BusinessCardProps {
-  id: string;
-  title: string;
-  description: string;
-  price: string;
-  inclusions: string[];
-  featured?: boolean;
-  category?: string;
+  business: BusinessConcept;
 }
 
-export function BusinessCard({
-  id,
-  title,
-  description,
-  price,
-  inclusions,
-  featured = false,
-  category,
-}: BusinessCardProps) {
+export function BusinessCard({ business }: BusinessCardProps) {
   return (
-    <div
-      className={`rounded-xl border bg-white p-6 hover:shadow-xl transition-shadow ${
-        featured ? 'border-blue-500 shadow-lg' : 'border-gray-200'
-      }`}
-    >
-      {featured && (
-        <div className="inline-block bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
-          Featured
-        </div>
-      )}
-      {category && !featured && (
-        <div className="inline-block bg-gray-100 text-gray-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
-          {category}
-        </div>
-      )}
-
-      <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 mb-4 line-clamp-2">{description}</p>
-
-      <div className="mb-4">
-        <span className="text-3xl font-bold text-gray-900">{price}</span>
-        {price.includes('From') && (
-          <span className="text-sm text-gray-500 ml-2">starting price</span>
-        )}
+    <article className="group flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge tone="brand">{getCategoryName(business.category)}</Badge>
+        <Badge tone={business.priority === 'High' ? 'warning' : 'neutral'}>
+          Sales fit: {business.priority}
+        </Badge>
       </div>
 
-      <div className="mb-6 space-y-2">
-        {inclusions.slice(0, 4).map((item, index) => (
-          <div key={index} className="flex items-start gap-2 text-sm text-gray-700">
-            <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-            <span>{item}</span>
-          </div>
-        ))}
+      <div className="mt-5 flex-1">
+        <h3 className="text-xl font-bold text-slate-900">{business.title}</h3>
+        <p className="mt-3 text-sm leading-6 text-slate-600">{business.shortDescription}</p>
+      </div>
+
+      <div className="mt-5 flex flex-wrap gap-2">
+        <Badge tone="neutral">Setup: {business.complexity}</Badge>
+        <Badge tone={business.revenueSpeed === 'Fast' ? 'success' : 'neutral'}>
+          Revenue speed: {business.revenueSpeed}
+        </Badge>
+        <Badge tone="neutral">{business.variations.length} version(s)</Badge>
       </div>
 
       <Link
-        to={`/business/${id}`}
-        className="inline-flex items-center justify-center gap-2 w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 transition-colors"
+        to={`/businesses/${business.slug}`}
+        onClick={() =>
+          trackEvent('business_card_clicked', {
+            businessSlug: business.slug,
+            category: business.category,
+            priority: business.priority,
+          })
+        }
+        className="mt-6 inline-flex items-center justify-between rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-colors group-hover:bg-sky-600"
       >
-        View Details
-        <ArrowRight className="h-4 w-4" />
+        View opportunity
+        <ArrowUpRight className="h-4 w-4" />
       </Link>
-    </div>
+    </article>
   );
 }
