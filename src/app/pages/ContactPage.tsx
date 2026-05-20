@@ -1,4 +1,4 @@
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, MapPin, Send } from 'lucide-react';
 import { useState, type ChangeEvent, type FormEvent } from 'react';
 
 const WEB3FORMS_ACCESS_KEY = '0327cba3-a670-48cf-bcef-f8c118dd2247';
@@ -383,22 +383,12 @@ export function ContactPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                      <a href="mailto:info@rbpmarketplace.com" className="text-gray-600 hover:text-blue-600">
-                        info@rbpmarketplace.com
+                      <a
+                        href="mailto:marketplace@remotebusinesspartner.com.au"
+                        className="text-gray-600 hover:text-blue-600"
+                      >
+                        marketplace@remotebusinesspartner.com.au
                       </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
-                      <Phone className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                      <a href="tel:+15551234567" className="text-gray-600 hover:text-blue-600">
-                        +1 (555) 123-4567
-                      </a>
-                      <p className="text-sm text-gray-500 mt-1">Mon-Fri, 9am-6pm EST</p>
                     </div>
                   </div>
 
