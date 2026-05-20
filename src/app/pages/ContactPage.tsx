@@ -1,33 +1,145 @@
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
+
+const WEB3FORMS_ACCESS_KEY = '0327cba3-a670-48cf-bcef-f8c118dd2247';
+const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+
+const ENQUIRY_TYPE_OPTIONS = [
+  { value: 'business-for-sale', label: 'Interested in a Business For Sale' },
+  { value: 'business-in-a-box', label: 'Interested in Business-In-A-Box' },
+  { value: 'custom-solution', label: 'Request Custom Solution' },
+  { value: 'general', label: 'General Enquiry' },
+] as const;
+
+const TIMELINE_OPTIONS = [
+  'Immediately',
+  'Within 2 weeks',
+  'Within 30 days',
+  '1-3 months',
+  'Just researching',
+] as const;
+
+type SubmitStatus = 'idle' | 'success' | 'error';
+
+type FormState = {
+  name: string;
+  email: string;
+  phone: string;
+  enquiryType: string;
+  budgetRange: string;
+  timeline: string;
+  message: string;
+  contactMethod: 'email' | 'phone' | 'either';
+  botcheck: string;
+};
+
+type Web3FormsResponse = {
+  success?: boolean;
+  message?: string;
+};
+
+const INITIAL_FORM_DATA: FormState = {
+  name: '',
+  email: '',
+  phone: '',
+  enquiryType: '',
+  budgetRange: '',
+  timeline: '',
+  message: '',
+  contactMethod: 'email',
+  botcheck: '',
+};
+
+function getEnquiryTypeLabel(enquiryType: string) {
+  return (
+    ENQUIRY_TYPE_OPTIONS.find((option) => option.value === enquiryType)?.label ??
+    enquiryType
+  );
+}
 
 export function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    enquiryType: '',
-    budgetRange: '',
-    message: '',
-    contactMethod: 'email',
-  });
+  const [formData, setFormData] = useState<FormState>(INITIAL_FORM_DATA);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
+  const [submitMessage, setSubmitMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    alert('Thank you for your enquiry! We will get back to you within 24 hours.');
+
+    if (formData.botcheck.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setSubmitMessage('');
+
+    const payload = {
+      access_key: WEB3FORMS_ACCESS_KEY,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      enquiryType: formData.enquiryType,
+      budgetRange: formData.budgetRange,
+      timeline: formData.timeline,
+      message: formData.message,
+      contactMethod: formData.contactMethod,
+      subject: `New RBP Marketplace Enquiry - ${getEnquiryTypeLabel(formData.enquiryType)}`,
+      botcheck: formData.botcheck,
+    };
+
+    try {
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = (await response.json()) as Web3FormsResponse;
+
+      if (response.ok && result.success) {
+        setSubmitStatus('success');
+        setSubmitMessage(
+          'Thanks for your enquiry. Our team has received your message and will be in touch soon.',
+        );
+        setFormData(INITIAL_FORM_DATA);
+        return;
+      }
+
+      setSubmitStatus('error');
+      setSubmitMessage(
+        result.message || 'Something went wrong while sending your enquiry. Please try again.',
+      );
+    } catch {
+      setSubmitStatus('error');
+      setSubmitMessage(
+        'We could not send your enquiry right now. Please check your connection and try again.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const fieldName = name as keyof FormState;
+
+    setFormData((currentFormData) => ({
+      ...currentFormData,
+      [fieldName]: value as FormState[typeof fieldName],
+    }));
+
+    if (submitStatus !== 'idle') {
+      setSubmitStatus('idle');
+      setSubmitMessage('');
+    }
   };
 
   return (
     <div className="bg-white min-h-screen">
-      {/* Header Section */}
       <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
@@ -42,15 +154,26 @@ export function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Form & Info Section */}
       <section className="py-16 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Contact Form */}
             <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="absolute left-[-9999px]" aria-hidden="true">
+                  <label htmlFor="botcheck">Leave this field empty</label>
+                  <input
+                    type="text"
+                    id="botcheck"
+                    name="botcheck"
+                    value={formData.botcheck}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
                 <div>
                   <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
                     Full Name *
@@ -101,7 +224,10 @@ export function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="enquiryType" className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label
+                    htmlFor="enquiryType"
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
                     Enquiry Type *
                   </label>
                   <select
@@ -113,31 +239,57 @@ export function ContactPage() {
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   >
                     <option value="">Select an option</option>
-                    <option value="business-for-sale">Interested in a Business For Sale</option>
-                    <option value="business-in-a-box">Interested in Business-In-A-Box</option>
-                    <option value="custom-solution">Request Custom Solution</option>
-                    <option value="general">General Enquiry</option>
+                    {ENQUIRY_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
-                <div>
-                  <label htmlFor="budgetRange" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Budget Range
-                  </label>
-                  <select
-                    id="budgetRange"
-                    name="budgetRange"
-                    value={formData.budgetRange}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  >
-                    <option value="">Select a range</option>
-                    <option value="under-5k">Under $5,000</option>
-                    <option value="5k-10k">$5,000 - $10,000</option>
-                    <option value="10k-25k">$10,000 - $25,000</option>
-                    <option value="25k-50k">$25,000 - $50,000</option>
-                    <option value="50k-plus">$50,000+</option>
-                  </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="budgetRange"
+                      className="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Budget Range
+                    </label>
+                    <select
+                      id="budgetRange"
+                      name="budgetRange"
+                      value={formData.budgetRange}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    >
+                      <option value="">Select a range</option>
+                      <option value="under-5k">Under $5,000</option>
+                      <option value="5k-10k">$5,000 - $10,000</option>
+                      <option value="10k-25k">$10,000 - $25,000</option>
+                      <option value="25k-50k">$25,000 - $50,000</option>
+                      <option value="50k-plus">$50,000+</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="timeline" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Timeline
+                    </label>
+                    <select
+                      id="timeline"
+                      name="timeline"
+                      value={formData.timeline}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    >
+                      <option value="">Select a timeline</option>
+                      {TIMELINE_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div>
@@ -168,6 +320,7 @@ export function ContactPage() {
                         value="email"
                         checked={formData.contactMethod === 'email'}
                         onChange={handleChange}
+                        required
                         className="mr-2"
                       />
                       <span className="text-sm text-gray-700">Email</span>
@@ -197,17 +350,29 @@ export function ContactPage() {
                   </div>
                 </div>
 
+                {submitStatus !== 'idle' && submitMessage && (
+                  <div
+                    className={`rounded-lg border px-4 py-3 text-sm ${
+                      submitStatus === 'success'
+                        ? 'border-green-200 bg-green-50 text-green-800'
+                        : 'border-red-200 bg-red-50 text-red-800'
+                    }`}
+                  >
+                    {submitMessage}
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-base font-semibold text-white hover:bg-blue-500 transition-colors"
+                  disabled={isSubmitting}
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-base font-semibold text-white hover:bg-blue-500 transition-colors disabled:cursor-not-allowed disabled:bg-blue-400"
                 >
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                   <Send className="h-5 w-5" />
                 </button>
               </form>
             </div>
 
-            {/* Contact Information */}
             <div className="space-y-8">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
@@ -258,8 +423,10 @@ export function ContactPage() {
                 </p>
                 <div className="bg-white rounded-lg p-4 border border-gray-200">
                   <p className="text-sm text-gray-600">
-                    <span className="font-semibold text-gray-900">Business Hours:</span><br />
-                    Monday - Friday: 9:00 AM - 6:00 PM EST<br />
+                    <span className="font-semibold text-gray-900">Business Hours:</span>
+                    <br />
+                    Monday - Friday: 9:00 AM - 6:00 PM EST
+                    <br />
                     Saturday - Sunday: Closed
                   </p>
                 </div>
