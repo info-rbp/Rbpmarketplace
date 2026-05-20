@@ -1,155 +1,165 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Zap, Shield, Headphones, TrendingUp } from 'lucide-react';
-import { BusinessCard } from '../components/BusinessCard';
-import { getFeaturedBusinesses } from '../data/businesses';
+import { ArrowRight, BarChart3, BriefcaseBusiness, Layers3, ShieldCheck } from 'lucide-react';
+import { categories } from '@/app/data/categories';
+import { getFeaturedBusinesses } from '@/app/data/businesses';
+import { CategoryCard } from '@/app/components/CategoryCard';
+import { BusinessGrid } from '@/app/components/BusinessGrid';
+import { getCategoryBusinessCount } from '@/app/lib/business';
+import { useDocumentMeta } from '@/app/hooks/useDocumentMeta';
+
+const featuredClusters = [
+  {
+    title: 'Compliance-as-a-Service',
+    body: 'A strong fit for buyers who want recurring revenue from templates, policy packs, audits, and support services.',
+  },
+  {
+    title: 'Property & Real Estate Services',
+    body: 'Inspection, landlord, and strata offers with clear customer pain points and repeatable workflow demand.',
+  },
+  {
+    title: 'Business Lifecycle Services',
+    body: 'Higher-value service businesses built around valuation, sale preparation, franchising, and custom delivery.',
+  },
+];
 
 export function HomePage() {
-  const featuredListings = getFeaturedBusinesses().slice(0, 3);
+  useDocumentMeta(
+    'Business-In-A-Box | RBP Marketplace',
+    'Explore Business-In-A-Box opportunities across compliance, property, insurance, service businesses, and digital platforms.',
+  );
+
+  const featuredBusinesses = getFeaturedBusinesses();
 
   return (
-    <div className="bg-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6">
-              Buy Ready-Made Digital Businesses
-              <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-2">
-                Launch Your Empire Today
-              </span>
-            </h1>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-              RBP Marketplace offers curated web applications, SaaS platforms, and complete business-in-a-box solutions.
-              Skip months of development and launch your online business immediately.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/businesses-for-sale"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-lg hover:bg-blue-500 transition-colors"
-              >
-                View Businesses For Sale
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-              <Link
-                to="/business-in-a-box"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-gray-300 bg-white px-8 py-4 text-base font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
-              >
-                Explore Business-In-A-Box
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose RBP Marketplace?
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We provide everything you need to launch and scale your online business with confidence.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-                <Zap className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Launch Fast</h3>
-              <p className="text-gray-600">
-                Ready-made solutions mean you can launch your business in days, not months.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
-                <Shield className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Vetted Quality</h3>
-              <p className="text-gray-600">
-                Every business is built to professional standards with clean code and documentation.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                <Headphones className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Full Support</h3>
-              <p className="text-gray-600">
-                Comprehensive handover process with setup assistance and ongoing support options.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 mb-4">
-                <TrendingUp className="h-8 w-8 text-orange-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Growth Ready</h3>
-              <p className="text-gray-600">
-                Scalable architecture designed to grow with your business and customer base.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Listings */}
-      <section className="py-20 bg-gray-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Featured Opportunities
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Explore our handpicked selection of premium digital businesses and web applications.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredListings.map((listing, index) => (
-              <BusinessCard key={index} {...listing} />
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link
-              to="/businesses-for-sale"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-8 py-4 text-base font-semibold text-white hover:bg-gray-800 transition-colors"
-            >
-              View All Businesses
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Start Your Digital Business?
-          </h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Book a discovery call with our team to discuss your goals and find the perfect business opportunity.
+    <div className="space-y-14 pb-16">
+      <section className="mx-auto grid max-w-7xl gap-8 px-4 pt-10 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8 lg:pt-16">
+        <div className="rounded-[2rem] bg-slate-950 px-6 py-10 text-white shadow-2xl sm:px-10">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-300">
+            Business-In-A-Box opportunities
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <h1 className="mt-5 text-4xl font-bold sm:text-6xl">
+            Buy, build, or partner on business concepts that are ready to be taken to market.
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
+            RBP Marketplace brings together practical business opportunities that can be sold
+            as services, templates, subscriptions, lead-generation sites, or complete digital
+            businesses.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/contact"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-8 py-4 text-base font-semibold text-blue-600 shadow-lg hover:bg-gray-50 transition-colors"
+              to="/businesses"
+              className="inline-flex items-center gap-2 rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-sky-400"
             >
-              Book a Discovery Call
+              Explore Businesses
+              <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              to="/custom-solutions"
-              className="inline-flex items-center justify-center gap-2 rounded-lg border-2 border-white px-8 py-4 text-base font-semibold text-white hover:bg-white hover:text-blue-600 transition-colors"
+              to="/assessment"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
             >
-              Request Custom Solution
+              Find My Best Fit
             </Link>
           </div>
+        </div>
+
+        <div className="grid gap-4">
+          {[
+            {
+              icon: ShieldCheck,
+              title: 'Clear, cleaned-up offers',
+              body: 'Each opportunity is grouped into one clear offer so buyers can understand what is actually on the table.',
+            },
+            {
+              icon: BriefcaseBusiness,
+              title: 'Designed to be commercial',
+              body: 'Every business includes customer fit, offer ideas, revenue paths, and practical ways it can be packaged.',
+            },
+            {
+              icon: BarChart3,
+              title: 'Easy to compare',
+              body: 'Use the compare and assessment tools to narrow the shortlist before you enquire or move forward.',
+            },
+          ].map((item) => (
+            <div key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+              <item.icon className="h-8 w-8 text-sky-600" />
+              <h2 className="mt-4 text-xl font-bold text-slate-900">{item.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">Categories</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-900">Browse by the type of business you want to own or launch</h2>
+          </div>
+          <Link to="/categories" className="text-sm font-semibold text-slate-900">
+            View all categories
+          </Link>
+        </div>
+        <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              businessCount={getCategoryBusinessCount(category.id)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-700">Featured opportunities</p>
+          <h2 className="mt-2 text-3xl font-bold text-slate-900">
+            Featured businesses with strong near-term sales potential
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+            These are some of the clearest Business-In-A-Box offers for buyers who want a
+            practical starting point, faster go-to-market options, or obvious customer demand.
+          </p>
+          <div className="mt-8">
+            <BusinessGrid businesses={featuredBusinesses} />
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+        {[
+          {
+            title: 'How Business-In-A-Box works',
+            body: 'Each listing starts with a sellable core offer, then expands into extra services, templates, content, or software as demand grows.',
+            icon: Layers3,
+          },
+          ...featuredClusters,
+        ].map((item) => (
+          <div key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+            {item.icon ? <item.icon className="h-8 w-8 text-sky-600" /> : null}
+            <h2 className="mt-4 text-xl font-bold text-slate-900">{item.title}</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{item.body}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-6 rounded-[2rem] bg-slate-900 p-8 text-white lg:grid-cols-3">
+          <div>
+            <h2 className="text-2xl font-bold">Move from interest to the right next step</h2>
+            <p className="mt-3 text-sm leading-7 text-slate-300">
+              Compare opportunities, use the fit assessment, or send an enquiry and we will
+              help you work out the best way to buy, build, or customise the business.
+            </p>
+          </div>
+          <Link to="/compare" className="rounded-[1.5rem] bg-white/5 p-6 hover:bg-white/10">
+            <p className="text-lg font-semibold">Compare opportunities</p>
+            <p className="mt-2 text-sm text-slate-300">Review up to four businesses side by side before you commit to one direction.</p>
+          </Link>
+          <Link to="/assessment" className="rounded-[1.5rem] bg-sky-500 p-6 hover:bg-sky-400">
+            <p className="text-lg font-semibold">Find the best fit</p>
+            <p className="mt-2 text-sm text-white/90">Answer a short quiz and get the three opportunities most likely to suit you.</p>
+          </Link>
         </div>
       </section>
     </div>
