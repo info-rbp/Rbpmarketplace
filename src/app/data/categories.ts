@@ -6,45 +6,45 @@ export const categories: Category[] = [
     name: 'Compliance-as-a-Service',
     slug: 'compliance-as-a-service',
     description:
-      'Businesses built around regulatory obligations, templates, audits, policies, and managed compliance workflows.',
+      'Business opportunities built around practical compliance support, policy packs, audit readiness, and subscription-style advisory services.',
     positioning:
-      'Best for templates, subscriptions, compliance checklists, audit readiness, policy packs, and advisory support.',
+      'Strong fit for buyers who want recurring revenue from templates, subscriptions, compliance reviews, and managed support.',
   },
   {
     id: 'property',
     name: 'Property & Real Estate Services',
     slug: 'property-real-estate-services',
     description:
-      'Web applications and service models for landlords, strata schemes, property inspections, and real estate operations.',
+      'Sellable service and digital businesses for landlords, strata schemes, inspection providers, and property operators.',
     positioning:
-      'Best for inspection workflows, document packs, landlord tools, strata administration, and service bookings.',
+      'Well suited to document packs, inspection workflows, landlord tools, and service-booking models with repeat demand.',
   },
   {
     id: 'business-lifecycle',
     name: 'Business Lifecycle Services',
     slug: 'business-lifecycle-services',
     description:
-      'Businesses that support starting, valuing, selling, franchising, or managing businesses.',
+      'Commercial offers that help clients start, value, sell, expand, or package their businesses more professionally.',
     positioning:
-      'Best for consulting, calculators, readiness reports, business sale preparation, franchise packaging, and high-ticket services.',
+      'Best for consulting-led offers, readiness reports, calculators, sale preparation, and higher-value advisory work.',
   },
   {
     id: 'insurance-risk',
     name: 'Insurance & Risk Services',
     slug: 'insurance-risk-services',
     description:
-      'Lead-generation, claims management, and risk-support businesses for insurance-related markets.',
+      'Lead-generation and service businesses focused on insurance enquiries, claims support, and business risk guidance.',
     positioning:
-      'Best for affiliate revenue, claims support, quote funnels, broker referrals, and risk checklists.',
+      'Strong fit for quote funnels, broker referrals, claims support, affiliate revenue, and practical risk resources.',
   },
   {
     id: 'digital-platforms',
     name: 'Digital Platforms & Marketplaces',
     slug: 'digital-platforms-marketplaces',
     description:
-      'Affiliate, recruitment, PLR, and remote-service platforms that can scale through content, marketplace mechanics, or partnerships.',
+      'Online businesses that can grow through content, listings, digital products, referrals, and remote-service delivery.',
     positioning:
-      'Best for scalable content sites, job boards, remote service marketplaces, PLR stores, and affiliate engines.',
+      'Well suited to buyers who want scalable digital products, niche marketplaces, affiliate sites, or service-led platforms.',
   },
 ];
 
