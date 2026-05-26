@@ -1,0 +1,4 @@
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD_HASH=pbkdf2$120000$replace-with-random-salt$replace-with-derived-hash
+SESSION_SECRET=replace-with-a-long-random-secret
+PUBLIC_APP_ORIGIN=http://localhost:8787
