@@ -1,6 +1,5 @@
 import {
   adminLoginSchema,
-  adminSessionCookieName,
   enquirySchema,
   type AdminEnquiryRecord,
   type AdminSessionResponse,
@@ -88,6 +87,10 @@ function json(payload: unknown, status = 200, headers?: HeadersInit) {
 
 function getAllowedOrigin(request: Request, env: Env) {
   return env.PUBLIC_APP_ORIGIN ?? new URL(request.url).origin;
+}
+
+function isSecureRequest(request: Request) {
+  return new URL(request.url).protocol === 'https:';
 }
 
 function getClientIp(request: Request) {
@@ -196,7 +199,7 @@ async function getAdminSession(request: Request, env: Env) {
     return null;
   }
 
-  const token = getCookie(request, adminSessionCookieName);
+  const token = getCookie(request, 'rbp_admin_session');
   if (!token) {
     return null;
   }
@@ -346,7 +349,7 @@ async function handleAdminLogin(request: Request, env: Env, ctx: ExecutionContex
   };
 
   return json(session, 200, {
-    'Set-Cookie': serializeSessionCookie(token, sessionDurationSeconds),
+    'Set-Cookie': serializeSessionCookie(token, sessionDurationSeconds, isSecureRequest(request)),
   });
 }
 
@@ -360,7 +363,7 @@ async function handleAdminLogout(request: Request, env: Env) {
     { authenticated: false },
     200,
     {
-      'Set-Cookie': serializeExpiredSessionCookie(),
+      'Set-Cookie': serializeExpiredSessionCookie(isSecureRequest(request)),
     },
   );
 }
