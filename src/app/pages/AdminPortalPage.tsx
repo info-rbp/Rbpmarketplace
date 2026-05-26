@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { categories } from '@/app/data/categories';
 import { businesses, getBusinessBySlug } from '@/app/data/businesses';
+import { categories } from '@/app/data/categories';
 import type { AdminEnquiryRecord, AdminSessionResponse } from '@/app/data/types';
 import { useDocumentMeta } from '@/app/hooks/useDocumentMeta';
 import { ApiError, apiRequest } from '@/app/lib/api';
+import { brandConfig } from '@/config/brand';
 
 function SummaryCard({
   label,
@@ -26,8 +27,8 @@ function SummaryCard({
 
 export function AdminPortalPage() {
   useDocumentMeta(
-    'Admin Portal | Business-In-A-Box',
-    'Review enquiries and the Business-In-A-Box catalogue from the admin portal.',
+    `Admin Portal | ${brandConfig.productName}`,
+    `Review enquiries and the ${brandConfig.productName} catalogue from the admin portal.`,
   );
 
   const navigate = useNavigate();
@@ -130,7 +131,7 @@ export function AdminPortalPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-300">
               Admin Portal
             </p>
-            <h1 className="mt-3 text-4xl font-bold">RBP Marketplace control room</h1>
+            <h1 className="mt-3 text-4xl font-bold">{brandConfig.brandName} control room</h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
               Use this portal to review durable enquiry submissions, keep the strongest
               sellable concepts front of mind, and jump back into the public pages when you
