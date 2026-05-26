@@ -156,10 +156,14 @@ export async function verifySessionToken(token: string, secret: string) {
   return payload;
 }
 
-export function serializeSessionCookie(token: string, maxAgeSeconds: number) {
-  return `${adminSessionCookieName}=${token}; HttpOnly; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Strict; Secure`;
+function cookieSecuritySuffix(secure: boolean) {
+  return secure ? '; SameSite=Strict; Secure' : '; SameSite=Lax';
 }
 
-export function serializeExpiredSessionCookie() {
-  return `${adminSessionCookieName}=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict; Secure`;
+export function serializeSessionCookie(token: string, maxAgeSeconds: number, secure: boolean) {
+  return `${adminSessionCookieName}=${token}; HttpOnly; Path=/; Max-Age=${maxAgeSeconds}${cookieSecuritySuffix(secure)}`;
+}
+
+export function serializeExpiredSessionCookie(secure: boolean) {
+  return `${adminSessionCookieName}=; HttpOnly; Path=/; Max-Age=0${cookieSecuritySuffix(secure)}`;
 }
