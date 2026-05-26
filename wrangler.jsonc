@@ -1,14 +1,24 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "rbpmarketplace",
+  "main": "server/index.ts",
   "compatibility_date": "2026-05-20",
   "observability": {
     "enabled": true
   },
   "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   },
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rbpmarketplace",
+      "database_id": "REPLACE_WITH_PRODUCTION_DATABASE_ID"
+    }
   ]
 }
