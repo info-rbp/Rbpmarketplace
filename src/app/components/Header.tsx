@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom';
+import { brandConfig } from '@/config/brand';
 
 const navItems = [
   { to: '/', label: 'Home' },
@@ -15,13 +16,13 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-900 text-sm font-bold text-white">
-            R
+            {brandConfig.brandInitials}
           </div>
           <div>
             <div className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-700">
-              RBP Marketplace
+              {brandConfig.brandName}
             </div>
-            <div className="text-lg font-bold text-slate-900">Business-In-A-Box</div>
+            <div className="text-lg font-bold text-slate-900">{brandConfig.productName}</div>
           </div>
         </Link>
 
