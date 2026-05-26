@@ -1,4 +1,4 @@
-import { adminSessionCookieName } from '@/shared/contracts';
+import { adminSessionCookieName } from '../src/shared/contracts';
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
