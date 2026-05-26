@@ -3,7 +3,7 @@ import {
   enquirySchema,
   type AdminEnquiryRecord,
   type AdminSessionResponse,
-} from '@/shared/contracts';
+} from '../src/shared/contracts';
 import {
   createSessionToken,
   hashIp,
