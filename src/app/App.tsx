@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { ScrollToTop } from './components/ScrollToTop';
 import { AboutPage } from './pages/AboutPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
@@ -33,7 +34,14 @@ export default function App() {
             <Route path="/enquire" element={<EnquirePage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route path="/admin" element={<AdminPortalPage />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPortalPage />
+                </ProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
