@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
+import { ScrollToTop } from './components/ScrollToTop';
 import { AboutPage } from './pages/AboutPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { AdminPortalPage } from './pages/AdminPortalPage';
@@ -12,10 +13,12 @@ import { CategoryDetailPage } from './pages/CategoryDetailPage';
 import { ComparePage } from './pages/ComparePage';
 import { EnquirePage } from './pages/EnquirePage';
 import { HomePage } from './pages/HomePage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div className="min-h-screen bg-transparent">
         <Header />
         <main className="flex-1">
@@ -31,6 +34,7 @@ export default function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminPortalPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
         <Footer />
