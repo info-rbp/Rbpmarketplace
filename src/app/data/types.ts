@@ -36,13 +36,9 @@ export interface BusinessConcept {
   priority: BuildPriority;
 }
 
-export interface EnquiryPayload {
-  name: string;
-  email: string;
-  phone?: string;
-  businessSlug?: string;
-  enquiryType: string;
-  budgetRange: string;
-  timeline: string;
-  message: string;
-}
+export type {
+  AdminEnquiryRecord,
+  AdminSessionResponse,
+  EnquiryFormValues,
+  EnquiryPayload,
+} from '@/shared/contracts';
