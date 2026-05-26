@@ -8,7 +8,7 @@ Create a D1 database for production and note the returned `database_id`.
 wrangler d1 create rbpmarketplace
 ```
 
-Update `wrangler.jsonc` with the production `database_id` and, if you use a preview database, add `preview_database_id` as well.
+Update `wrangler.jsonc` with the production `database_id`. If you use a preview database, add `preview_database_id` to the same binding.
 
 ## 2. Apply the database migrations
 
@@ -16,7 +16,7 @@ Update `wrangler.jsonc` with the production `database_id` and, if you use a prev
 npm run db:migrate:remote
 ```
 
-## 3. Configure secrets
+## 3. Configure runtime values
 
 Set these Worker secrets before deploying:
 
@@ -26,7 +26,7 @@ wrangler secret put ADMIN_PASSWORD_HASH
 wrangler secret put SESSION_SECRET
 ```
 
-Optional runtime variable:
+Set the public application origin as a Worker variable or secret for the deployed domain, for example:
 
 ```bash
 wrangler secret put PUBLIC_APP_ORIGIN
@@ -68,3 +68,10 @@ Check these flows on the deployed site:
 3. Confirm `/api/health` returns a 200 response.
 4. Confirm unknown routes render the custom 404 page.
 5. Confirm session cookies are `HttpOnly`, `Secure`, and `SameSite=Strict`.
+6. Confirm lint, typecheck, tests, and build all pass in CI.
+
+## 8. Operational follow-up
+
+- Rotate `SESSION_SECRET` if admin cookie signing credentials ever need to be invalidated.
+- Back up or export D1 enquiry data on the cadence your sales or operations team requires.
+- If multiple internal users will access the admin portal, move from environment-level credentials to a proper multi-user identity model.
