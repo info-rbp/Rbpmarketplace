@@ -1,12 +1,9 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import type { AdminSessionResponse } from '@/app/data/types';
 import { useDocumentMeta } from '@/app/hooks/useDocumentMeta';
-import {
-  getAdminCredentials,
-  hasAdminSession,
-  startAdminSession,
-  validateAdminCredentials,
-} from '@/app/lib/admin';
+import { ApiError, apiRequest } from '@/app/lib/api';
+import { adminLoginSchema } from '@/shared/contracts';
 
 export function AdminLoginPage() {
   useDocumentMeta(
@@ -19,10 +16,37 @@ export function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const credentials = getAdminCredentials();
+  const [checkingSession, setCheckingSession] = useState(true);
+  const [alreadyAuthenticated, setAlreadyAuthenticated] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const redirectTarget = new URLSearchParams(location.search).get('redirect') || '/admin';
 
-  if (hasAdminSession()) {
+  useEffect(() => {
+    let cancelled = false;
+
+    apiRequest<AdminSessionResponse>('/api/admin/session')
+      .then((session) => {
+        if (!cancelled && session.authenticated) {
+          setAlreadyAuthenticated(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAlreadyAuthenticated(false);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setCheckingSession(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (alreadyAuthenticated) {
     return <Navigate to="/admin" replace />;
   }
 
@@ -30,13 +54,41 @@ export function AdminLoginPage() {
     event.preventDefault();
     setError('');
 
-    if (!validateAdminCredentials(email, password)) {
-      setError('Those details did not match the current admin login.');
+    const parsed = adminLoginSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message ?? 'Please check your login details and try again.');
       return;
     }
 
-    startAdminSession();
-    navigate(redirectTarget, { replace: true });
+    setIsSubmitting(true);
+    apiRequest<AdminSessionResponse>('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify(parsed.data),
+    })
+      .then(() => {
+        navigate(redirectTarget, { replace: true });
+      })
+      .catch((apiError) => {
+        if (apiError instanceof ApiError) {
+          setError(apiError.message);
+          return;
+        }
+
+        setError('The login service is currently unavailable. Please try again shortly.');
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  }
+
+  if (checkingSession) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-sm text-slate-600">Checking admin session…</p>
+        </section>
+      </div>
+    );
   }
 
   return (
@@ -53,25 +105,6 @@ export function AdminLoginPage() {
           opportunities in the catalogue, and manage internal follow-up.
         </p>
       </section>
-
-      {credentials.isTemporary ? (
-        <section className="rounded-[2rem] border border-amber-200 bg-amber-50 p-6 text-sm leading-7 text-amber-900 shadow-sm">
-          <p className="font-semibold">Temporary admin credentials are active.</p>
-          <p className="mt-2">
-            This login is running on the fallback credentials because
-            <code className="mx-1 rounded bg-white px-1.5 py-0.5 text-xs">VITE_ADMIN_EMAIL</code>
-            and
-            <code className="mx-1 rounded bg-white px-1.5 py-0.5 text-xs">VITE_ADMIN_PASSWORD</code>
-            are not set yet.
-          </p>
-          <p className="mt-2">
-            Email: <span className="font-semibold">{credentials.email}</span>
-          </p>
-          <p>
-            Password: <span className="font-semibold">{credentials.password}</span>
-          </p>
-        </section>
-      ) : null}
 
       <form
         onSubmit={handleSubmit}
@@ -103,9 +136,10 @@ export function AdminLoginPage() {
 
         <button
           type="submit"
-          className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-sky-600"
+          disabled={isSubmitting}
+          className="rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-sky-600 disabled:opacity-60"
         >
-          Sign in
+          {isSubmitting ? 'Signing in...' : 'Sign in'}
         </button>
       </form>
     </div>
