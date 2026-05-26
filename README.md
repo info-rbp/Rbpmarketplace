@@ -8,7 +8,8 @@ RBP Marketplace is a React + Cloudflare application for showcasing and qualifyin
 - Backend: Cloudflare Worker in `server/index.ts`
 - Database: Cloudflare D1 with migrations in `migrations/`
 - Security: server-side admin authentication, PBKDF2 password hashing, signed `HttpOnly` session cookies, and IP-based rate limiting
-- Tests: Vitest unit coverage for catalogue logic and auth/session helpers
+- Validation: shared Zod schemas reused by the frontend form and worker API
+- Tests: Vitest coverage for catalogue logic, auth/session helpers, and worker API flows
 
 Additional implementation notes live in [ARCHITECTURE.md](./ARCHITECTURE.md).
 
@@ -34,14 +35,16 @@ Required variables:
 ### 3. Create a local D1 database and apply migrations
 
 ```bash
-wrangler d1 migrations apply DB --local
+npm run db:migrate:local
 ```
 
-### 4. Start the frontend
+### 4. Start the frontend-only development server
 
 ```bash
 npm run dev
 ```
+
+This serves the React UI only. Public form submissions and admin login require the worker-backed preview below.
 
 ### 5. Preview the full worker-backed app
 
@@ -52,6 +55,7 @@ npm run preview
 ## Quality checks
 
 ```bash
+npm run lint
 npm run typecheck
 npm run test
 npm run build
@@ -75,4 +79,5 @@ Detailed production steps are documented in [DEPLOYMENT.md](./DEPLOYMENT.md).
 - The admin portal is no longer backed by browser storage. Enquiries are stored in D1.
 - Admin credentials are no longer shipped to the browser. Only the server sees the configured password hash.
 - `wrangler.jsonc` intentionally contains a placeholder D1 `database_id`; replace it during environment provisioning.
+- Local preview uses a non-`Secure` cookie for `http://localhost` so the admin flow can be tested locally. HTTPS deployments always use `Secure` cookies.
 - Catalogue content is still source-controlled. If the business team needs non-developer editing, the next step is a real CMS integration.
