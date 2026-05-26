@@ -2,10 +2,11 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, BriefcaseBusiness, Layers3, ShieldCheck } from 'lucide-react';
 import { categories } from '@/app/data/categories';
 import { getFeaturedBusinesses } from '@/app/data/businesses';
-import { CategoryCard } from '@/app/components/CategoryCard';
 import { BusinessGrid } from '@/app/components/BusinessGrid';
-import { getCategoryBusinessCount } from '@/app/lib/business';
+import { CategoryCard } from '@/app/components/CategoryCard';
 import { useDocumentMeta } from '@/app/hooks/useDocumentMeta';
+import { getCategoryBusinessCount } from '@/app/lib/business';
+import { brandConfig } from '@/config/brand';
 
 const featuredClusters = [
   {
@@ -24,8 +25,8 @@ const featuredClusters = [
 
 export function HomePage() {
   useDocumentMeta(
-    'Business-In-A-Box | RBP Marketplace',
-    'Explore Business-In-A-Box opportunities across compliance, property, insurance, service businesses, and digital platforms.',
+    `${brandConfig.productName} | ${brandConfig.brandName}`,
+    `${brandConfig.productDescription}`,
   );
 
   const featuredBusinesses = getFeaturedBusinesses();
@@ -35,15 +36,15 @@ export function HomePage() {
       <section className="mx-auto grid max-w-7xl gap-8 px-4 pt-10 sm:px-6 lg:grid-cols-[1.2fr_0.8fr] lg:px-8 lg:pt-16">
         <div className="rounded-[2rem] bg-slate-950 px-6 py-10 text-white shadow-2xl sm:px-10">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-sky-300">
-            Business-In-A-Box opportunities
+            {brandConfig.productLabel}
           </p>
           <h1 className="mt-5 text-4xl font-bold sm:text-6xl">
             Buy, build, or partner on business concepts that are ready to be taken to market.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            RBP Marketplace brings together practical business opportunities that can be sold
-            as services, templates, subscriptions, lead-generation sites, or complete digital
-            businesses.
+            {brandConfig.brandName} brings together practical business opportunities that can
+            be sold as services, templates, subscriptions, lead-generation sites, or complete
+            digital businesses.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -117,7 +118,7 @@ export function HomePage() {
             Featured businesses with strong near-term sales potential
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            These are some of the clearest Business-In-A-Box offers for buyers who want a
+            These are some of the clearest {brandConfig.productName} offers for buyers who want a
             practical starting point, faster go-to-market options, or obvious customer demand.
           </p>
           <div className="mt-8">
@@ -129,7 +130,7 @@ export function HomePage() {
       <section className="mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
         {[
           {
-            title: 'How Business-In-A-Box works',
+            title: `How ${brandConfig.productName} works`,
             body: 'Each listing starts with a sellable core offer, then expands into extra services, templates, content, or software as demand grows.',
             icon: Layers3,
           },
