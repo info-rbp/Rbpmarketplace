@@ -4,11 +4,12 @@ import type { AdminSessionResponse } from '@/app/data/types';
 import { useDocumentMeta } from '@/app/hooks/useDocumentMeta';
 import { ApiError, apiRequest } from '@/app/lib/api';
 import { adminLoginSchema } from '@/shared/contracts';
+import { brandConfig } from '@/config/brand';
 
 export function AdminLoginPage() {
   useDocumentMeta(
-    'Admin Login | Business-In-A-Box',
-    'Sign in to the Business-In-A-Box admin portal.',
+    `Admin Login | ${brandConfig.productName}`,
+    `Sign in to the ${brandConfig.productName} admin portal.`,
   );
 
   const navigate = useNavigate();
@@ -102,7 +103,7 @@ export function AdminLoginPage() {
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
           Use the admin area to review stored enquiries, keep an eye on the strongest
-          opportunities in the catalogue, and manage internal follow-up.
+          opportunities in the catalogue, and manage internal follow-up for {brandConfig.brandName}.
         </p>
       </section>
 
