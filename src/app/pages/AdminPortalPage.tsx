@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { categories } from '@/app/data/categories';
 import { businesses, getBusinessBySlug } from '@/app/data/businesses';
-import type { EnquiryPayload } from '@/app/data/types';
+import type { AdminEnquiryRecord, AdminSessionResponse } from '@/app/data/types';
 import { useDocumentMeta } from '@/app/hooks/useDocumentMeta';
-import {
-  clearAdminSession,
-  getAdminSnapshot,
-  hasAdminSession,
-} from '@/app/lib/admin';
+import { ApiError, apiRequest } from '@/app/lib/api';
 
 function SummaryCard({
   label,
@@ -35,22 +31,95 @@ export function AdminPortalPage() {
   );
 
   const navigate = useNavigate();
-  const [enquiries, setEnquiries] = useState<EnquiryPayload[]>([]);
+  const [session, setSession] = useState<AdminSessionResponse | null>(null);
+  const [enquiries, setEnquiries] = useState<AdminEnquiryRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
-    setEnquiries(getAdminSnapshot().enquiries);
+    let cancelled = false;
+
+    async function loadPortal() {
+      try {
+        const [sessionResponse, enquiryResponse] = await Promise.all([
+          apiRequest<AdminSessionResponse>('/api/admin/session'),
+          apiRequest<{ items: AdminEnquiryRecord[] }>('/api/admin/enquiries?limit=100'),
+        ]);
+
+        if (!sessionResponse.authenticated) {
+          if (!cancelled) {
+            setAccessDenied(true);
+          }
+          return;
+        }
+
+        if (!cancelled) {
+          setSession(sessionResponse);
+          setEnquiries(enquiryResponse.items);
+        }
+      } catch (requestError) {
+        if (requestError instanceof ApiError && requestError.status === 401) {
+          if (!cancelled) {
+            setAccessDenied(true);
+          }
+          return;
+        }
+
+        if (!cancelled) {
+          setError('The admin portal could not load right now. Please try again shortly.');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadPortal();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (!hasAdminSession()) {
+  const highPriorityBusinesses = useMemo(
+    () => businesses.filter((business) => business.priority === 'High'),
+    [],
+  );
+  const fastLaunchBusinesses = useMemo(
+    () => businesses.filter((business) => business.revenueSpeed === 'Fast'),
+    [],
+  );
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat('en-AU', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }),
+    [],
+  );
+
+  async function handleLogout() {
+    try {
+      await apiRequest('/api/admin/logout', { method: 'POST' });
+    } finally {
+      navigate('/admin/login', { replace: true });
+    }
+  }
+
+  if (accessDenied) {
     return <Navigate to="/admin/login?redirect=/admin" replace />;
   }
 
-  const highPriorityBusinesses = businesses.filter((business) => business.priority === 'High');
-  const fastLaunchBusinesses = businesses.filter((business) => business.revenueSpeed === 'Fast');
-
-  function handleLogout() {
-    clearAdminSession();
-    navigate('/admin/login', { replace: true });
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+        <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+          <p className="text-sm text-slate-600">Loading admin portal…</p>
+        </section>
+      </div>
+    );
   }
 
   return (
@@ -63,10 +132,13 @@ export function AdminPortalPage() {
             </p>
             <h1 className="mt-3 text-4xl font-bold">RBP Marketplace control room</h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
-              Use this portal to review incoming enquiries from this browser session, keep
-              the strongest sellable concepts front of mind, and jump back into the public
-              pages when you need to check the buyer experience.
+              Use this portal to review durable enquiry submissions, keep the strongest
+              sellable concepts front of mind, and jump back into the public pages when you
+              need to check the buyer experience.
             </p>
+            {session?.email ? (
+              <p className="mt-3 text-sm text-slate-300">Signed in as {session.email}</p>
+            ) : null}
           </div>
           <button
             type="button"
@@ -77,6 +149,12 @@ export function AdminPortalPage() {
           </button>
         </div>
       </section>
+
+      {error ? (
+        <section className="rounded-[2rem] border border-rose-200 bg-rose-50 p-6 text-sm text-rose-700 shadow-sm">
+          {error}
+        </section>
+      ) : null}
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
@@ -97,7 +175,7 @@ export function AdminPortalPage() {
         <SummaryCard
           label="Stored Enquiries"
           value={String(enquiries.length)}
-          detail="Enquiries saved in this browser when the API is unavailable."
+          detail="Enquiries securely stored in the production database."
         />
       </section>
 
@@ -119,19 +197,19 @@ export function AdminPortalPage() {
 
           {enquiries.length === 0 ? (
             <div className="mt-6 rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm leading-7 text-slate-600">
-              No local enquiries are stored in this browser yet. Once a visitor submits the
-              form and the fallback storage is used, those enquiries will appear here.
+              No enquiries have been stored yet. Once a visitor submits the public form,
+              those records will appear here for follow-up.
             </div>
           ) : (
             <div className="mt-6 space-y-4">
-              {enquiries.slice().reverse().map((enquiry, index) => {
+              {enquiries.map((enquiry) => {
                 const businessTitle = enquiry.businessSlug
                   ? getBusinessBySlug(enquiry.businessSlug)?.title
                   : null;
 
                 return (
                   <article
-                    key={`${enquiry.email}-${index}`}
+                    key={enquiry.id}
                     className="rounded-3xl border border-slate-200 bg-slate-50 p-5"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -139,14 +217,19 @@ export function AdminPortalPage() {
                         <h3 className="text-lg font-bold text-slate-900">{enquiry.name}</h3>
                         <p className="text-sm text-slate-600">{enquiry.email}</p>
                       </div>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                        {enquiry.timeline}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                          {enquiry.timeline}
+                        </span>
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                          {dateFormatter.format(new Date(enquiry.createdAt))}
+                        </span>
+                      </div>
                     </div>
                     <div className="mt-4 grid gap-3 md:grid-cols-2">
                       <p className="text-sm text-slate-700">
                         <span className="font-semibold">Interest:</span>{' '}
-                        {businessTitle || 'General enquiry'}
+                        {businessTitle || enquiry.businessSlug || 'General enquiry'}
                       </p>
                       <p className="text-sm text-slate-700">
                         <span className="font-semibold">Budget:</span> {enquiry.budgetRange}
